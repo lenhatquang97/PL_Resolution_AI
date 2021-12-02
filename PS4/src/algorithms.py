@@ -12,6 +12,12 @@ def isEqualUsedOnlyOr(val1: str, val2: str) -> bool:
             return False
     return True
 
+def checkClauseInClauses(clause, clauses):
+    for val in clauses:
+        if isEqualUsedOnlyOr(clause,val):
+            return True
+    return False
+
 #Remove duplicates with OR condition
 def removeDupOr(a: list) -> list:
     arr = copy.deepcopy(a)
@@ -123,35 +129,35 @@ def smallInLarge(small,large):
     return count == len(small)
 
 
-def printArr(arr):
+def printArr(arr:list,resultArr:list):
     for itr in arr:
         clArr = [0 for i in range(26)]
         parseClauseIntoArray(itr,clArr)
-        print(clauseArrIntoClause(clArr))
+        resultArr.append(clauseArrIntoClause(clArr))
 
 #Write pl_resolution function
-def plResolution(kbValues: list, alpha: str) -> bool:
+def plResolution(kbValues: list, alpha: str, resultArr: list) -> bool:
     clauses = putNegativeAlphaIntoKB(kbValues, alpha)
     new = []
     while len(clauses) > 0:
         for i in range(0,len(clauses)-1):
             for j in range(i+1,len(clauses)):
                 resolvents = plResolve(clauses[i], clauses[j])
-                if resolvents in clauses or resolvents == " ":
+                if resolvents in clauses or resolvents == " " or checkClauseInClauses(resolvents,clauses):
                     continue
                 else:
                     #print(clauses[i] + " + " + clauses[j] + " = " + resolvents)
                     new.append(resolvents)
         new = copy.deepcopy(removeDupOr(list(dict.fromkeys(new))))
         if containsEmptyClause(new):
-            print(len(new))
-            printArr(new)
+            resultArr.append(str(len(new)))
+            printArr(new,resultArr)
             return True
         if smallInLarge(new,clauses):
-            print(0)
+            resultArr.append('0')
             return False
-        print(len(new))
-        printArr(new)
+        resultArr.append(str(len(new)))
+        printArr(new,resultArr)
         clauses.extend(new)
         clauses = copy.deepcopy(removeDupOr(list(dict.fromkeys(clauses))))
         new = []
